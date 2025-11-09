@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gypsum CAAG Converter</title>
+    
+    <!-- Load Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Use Inter font family */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Custom style for the rounded container and shadow */
+        .card-container {
+            border-radius: 2rem; 
+            background-color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Custom style for the dashed input/output boxes */
+        .dashed-output-container {
+            border: 2px dashed #3B82F6; /* blue-500 */
+        }
+        .dashed-output-label {
+            border: 2px solid #3B82F6; /* blue-500 */
+            background-color: white;
+        }
+
+        /* Custom style for the main input with green border */
+        .main-input-wrapper {
+            border: 2px solid #10B981; /* emerald-500 */
+        }
+        .main-input {
+            font-size: 1.5rem; /* Large font size */
+            font-weight: 600;
+        }
+        
+        /* Remove number input arrows */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Custom separator line */
+        .separator {
+            border-top: 2px dashed #D1D5DB; /* gray-300 */
+        }
+
+        /* Button styling to match the image */
+        .back-button {
+            background-color: #00BFFF; /* Deep Sky Blue for visual match */
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            border-radius: 0.75rem;
+        }
+        .back-button:hover {
+            background-color: #00A3CC; 
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- App Container -->
+    <div class="card-container p-6 sm:p-8 w-full max-w-sm">
+        
+         <!-- Header Logo (Text version from image) -->
+        <div class="text-center mb-6">
+            <div class="flex justify-center items-center mb-1">
+               <img src="logo.jpg">
+            </div>
+          <br>
+
+        <!-- Title Box -->
+        <div class="border-2 border-blue-500 rounded-lg text-center py-3 px-5 font-bold text-xl text-gray-800 mb-4">
+            GPSUM CAAG
+        </div>
+        
+        
+        <!-- Main Input for Area -->
+        <div class="mb-6">
+            <div class="w-full py-3 px-5 text-center main-input-wrapper rounded-lg bg-gray-50">
+                <input 
+                    type="number" 
+                    id="areaInput" 
+                    value="" 
+                    oninput="calculateGypsum()"
+                    class="w-full py-0 px-0 text-center main-input bg-gray-50 focus:outline-none"
+                    step="any"
+                    placeholder="Enter Meters"
+                >
+            </div>
+        </div>
+
+        <!-- --- PART 1: GYPSUM PANELS OUTPUTS --- -->
+        <div class="grid grid-cols-[auto_1fr] gap-3 items-center mb-6">
+            
+            <label for="cartoon_result" class="py-3 px-4 font-semibold text-gray-800 text-center text-sm sm:text-base dashed-output-label rounded-lg">
+                Cartoon
+            </label>
+            <input 
+                type="text" 
+                id="cartoon_result" 
+                value=""
+                readonly 
+                class="w-full py-3 px-5 text-center text-2xl font-bold text-gray-800 dashed-output-container rounded-lg bg-gray-50"
+            >
+
+            <label for="firi_result" class="py-3 px-4 font-semibold text-gray-800 text-center text-sm sm:text-base dashed-output-label rounded-lg">
+                FIRI
+            </label>
+            <input 
+                type="text" 
+                id="firi_result" 
+                value=""
+                readonly 
+                class="w-full py-3 px-5 text-center text-2xl font-bold text-gray-800 dashed-output-container rounded-lg bg-gray-50"
+            >
+        </div>
+
+        <!-- Separator -->
+        <div class="separator mb-6 mt-6"></div>
+
+        <!-- --- PART 2: STRUCTURAL COMPONENTS OUTPUTS (Cartoon/Firi Split) --- -->
+        
+        <!-- Column Headers - Cartoon is now in the middle, prioritized -->
+        <div class="grid grid-cols-3 gap-2 items-center text-center">
+            <div></div> 
+            <div class="font-bold text-sm text-blue-600">CARTOON</div>
+            <div class="font-bold text-sm text-gray-600">Firi</div>
+        </div>
+
+        <div class="space-y-3 mt-2">
+            
+            <!-- Angle -->
+            <div class="grid grid-cols-3 gap-2 items-center">
+                <label class="py-2 px-2 font-semibold text-gray-800 text-center text-xs sm:text-sm dashed-output-label rounded-lg">
+                    Angle
+                </label>
+                <!-- Cartoon Result -->
+                <input type="text" id="angle_cartoon" value="" readonly class="py-2 px-1 text-center font-bold text-blue-800 border-2 border-blue-500 rounded-lg bg-blue-50 text-base">
+                <!-- Firi Remainder -->
+                <input type="text" id="angle_firi" value="" readonly class="py-2 px-1 text-center font-bold text-gray-800 dashed-output-container rounded-lg bg-gray-50 text-base">
+            </div>
+
+            <!-- Main Tee -->
+            <div class="grid grid-cols-3 gap-2 items-center">
+                <label class="py-2 px-2 font-semibold text-gray-800 text-center text-xs sm:text-sm dashed-output-label rounded-lg">
+                    Main Tee
+                </label>
+                <!-- Cartoon Result -->
+                <input type="text" id="main_tee_cartoon" value="" readonly class="py-2 px-1 text-center font-bold text-blue-800 border-2 border-blue-500 rounded-lg bg-blue-50 text-base">
+                <!-- Firi Remainder -->
+                <input type="text" id="main_tee_firi" value="" readonly class="py-2 px-1 text-center font-bold text-gray-800 dashed-output-container rounded-lg bg-gray-50 text-base">
+            </div>
+
+            <!-- Bir 120 -->
+            <div class="grid grid-cols-3 gap-2 items-center">
+                <label class="py-2 px-2 font-semibold text-gray-800 text-center text-xs sm:text-sm dashed-output-label rounded-lg">
+                    Bir 120
+                </label>
+                <!-- Cartoon Result -->
+                <input type="text" id="bir_120_cartoon" value="" readonly class="py-2 px-1 text-center font-bold text-blue-800 border-2 border-blue-500 rounded-lg bg-blue-50 text-base">
+                <!-- Firi Remainder -->
+                <input type="text" id="bir_120_firi" value="" readonly class="py-2 px-1 text-center font-bold text-gray-800 dashed-output-container rounded-lg bg-gray-50 text-base">
+            </div>
+
+            <!-- Bir 60 -->
+            <div class="grid grid-cols-3 gap-2 items-center">
+                <label class="py-2 px-2 font-semibold text-gray-800 text-center text-xs sm:text-sm dashed-output-label rounded-lg">
+                    Bir 60
+                </label>
+                <!-- Cartoon Result -->
+                <input type="text" id="bir_60_cartoon" value="" readonly class="py-2 px-1 text-center font-bold text-blue-800 border-2 border-blue-500 rounded-lg bg-blue-50 text-base">
+                <!-- Firi Remainder -->
+                <input type="text" id="bir_60_firi" value="" readonly class="py-2 px-1 text-center font-bold text-gray-800 dashed-output-container rounded-lg bg-gray-50 text-base">
+            </div>
+        </div>
+
+        <!-- BACK Button -->
+        <div class="mt-8">
+            <a 
+                href="index.html" 
+                class="back-button text-white w-full py-3.5 rounded-lg font-bold text-lg tracking-wider block text-center"
+            >
+                BACK
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // --- PANEL CONSTANTS (Area-Based Conversion) ---
+        const CARTOON_AREA = 7.08; // Area covered by 1 Cartoon (m^2)
+        const FIRI_AREA = 0.354;   // Area covered by 1 Firi (m^2)
+        
+        // Calculated number of Firi pieces that make up a Cartoon based on area ratio (7.08 / 0.354 = 20)
+        const FIRI_PER_CARTOON_PANEL = Math.round(CARTOON_AREA / FIRI_AREA); // 20 
+
+        // Structural Conversion Rates (Firi pieces per 1 Cartoon)
+        const FIRI_PER_CARTOON_ANGLE = 50; 
+        const FIRI_PER_CARTOON_MAIN_TEE = 27; 
+        const FIRI_PER_CARTOON_BIR_120 = 75; 
+        const FIRI_PER_CARTOON_BIR_60 = 75; 
+        
+        // --- STRUCTURAL MATERIAL CONSTANTS (Firi units required per square meter (m^2)) ---
+        const structuralFiriPerSqm = {
+            // Angle factor: 0.4
+            angle: 0.4, 
+            // Main Tee factor: 0.4
+            mainTee: 0.225, 
+            // Bir 120 factor: 1.35
+            bir120: 1.35, 
+            // Bir 60 factor: 1.4
+            bir60: 1.4
+        };
+        
+        /**
+         * Calculates the required quantity of structural components (Angle, Tee, Bir).
+         * Uses Math.round to round up at 0.5 or above, otherwise rounds down.
+         * Then converts the total Firi units into Cartoons and remaining Firi.
+         * * @param {string} idPrefix - The prefix for the HTML output IDs (e.g., 'angle').
+         * @param {number} firiPerSqm - The Firi unit requirement per square meter (the multiplier for the area).
+         * @param {number} cartoonFiriRate - The specific number of Firi pieces in 1 Cartoon for this material.
+         */
+        const calculateStructural = (idPrefix, firiPerSqm, cartoonFiriRate) => {
+            const area = parseFloat(document.getElementById('areaInput').value);
+            
+            // Safety check for invalid input
+            if (isNaN(area) || area <= 0) {
+                 document.getElementById(`${idPrefix}_cartoon`).value = 0;
+                 document.getElementById(`${idPrefix}_firi`).value = 0;
+                 return;
+            }
+
+            // 1. Calculate total required Firi pieces (fractional)
+            const requiredPiecesFractional = area * firiPerSqm;
+            
+            // 2. Apply standard rounding (0.5 and up rounds to the next whole number)
+            const totalFiriRequired = Math.round(requiredPiecesFractional);
+            
+            // 3. Convert total Firi into Cartoons and remaining Firi
+            const cartoonCount = Math.floor(totalFiriRequired / cartoonFiriRate);
+            const firiCount = totalFiriRequired % cartoonFiriRate;
+            
+            document.getElementById(`${idPrefix}_cartoon`).value = cartoonCount;
+            document.getElementById(`${idPrefix}_firi`).value = firiCount;
+        };
+
+        function calculateGypsum() {
+            let area = parseFloat(document.getElementById('areaInput').value);
+            
+            if (isNaN(area) || area <= 0) {
+                // Clear outputs if input is invalid or zero
+                document.getElementById('cartoon_result').value = 0;
+                document.getElementById('firi_result').value = 0;
+                
+                // Clear structural outputs and return
+                const structuralIds = ['angle', 'main_tee', 'bir_120', 'bir_60'];
+                structuralIds.forEach(id => {
+                    document.getElementById(`${id}_cartoon`).value = 0;
+                    document.getElementById(`${id}_firi`).value = 0;
+                });
+                return;
+            }
+            
+            // --- PART 1: GYPSUM PANELS CALCULATION (Area-Based Conversion) ---
+            
+            // Calculate total Firi pieces required (round at 0.5)
+            // area / FIRI_AREA gives the fractional number of Firi pieces needed.
+            let totalFiriRequired = Math.round(area / FIRI_AREA);
+            
+            // Convert required Firi into Cartoons and remaining Firi based on the 20 Firi/Cartoon panel rate
+            let panelCartoonCount = Math.floor(totalFiriRequired / FIRI_PER_CARTOON_PANEL);
+            let panelFiriCount = totalFiriRequired % FIRI_PER_CARTOON_PANEL;
+            
+            document.getElementById('cartoon_result').value = panelCartoonCount;
+            document.getElementById('firi_result').value = panelFiriCount;
+
+            // --- PART 2: STRUCTURAL COMPONENTS CALCULATION (Piece-Based Conversion) ---
+            
+            // Run calculation for all structural elements
+            calculateStructural('angle', structuralFiriPerSqm.angle, FIRI_PER_CARTOON_ANGLE); 
+            calculateStructural('main_tee', structuralFiriPerSqm.mainTee, FIRI_PER_CARTOON_MAIN_TEE); 
+            calculateStructural('bir_120', structuralFiriPerSqm.bir120, FIRI_PER_CARTOON_BIR_120);
+            calculateStructural('bir_60', structuralFiriPerSqm.bir60, FIRI_PER_CARTOON_BIR_60);
+        }
+
+        // Initialize the calculator on load with the default input (7.08)
+        window.onload = function() {
+            // Attach input event listener directly to the input field
+            const areaInput = document.getElementById('areaInput');
+            areaInput.addEventListener('input', calculateGypsum);
+
+            // Run initial calculation
+            calculateGypsum();
+        };
+    </script>
+
+</body>
+</html>
