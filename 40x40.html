@@ -3,113 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shaafici Calculator</title>
-    <!-- Load Tailwind CSS for styling -->
+    <title>Trading Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
-        /* Use Inter font family */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        
-        /* Custom style for the dashed input/output boxes */
-        .dashed-box {
-            border: 2px dashed #3B82F6; /* blue-500 */
-            background-image: repeating-linear-gradient(90deg, #3B82F6, #3B82F6 10px, transparent 10px, transparent 20px);
-            background-size: 100% 2px;
-            background-position: center;
-            background-repeat: no-repeat;
-            
-            /* Simpler border for browsers that struggle with the above */
-            border: 2px dashed #3B82F6;
+        /* Custom border for dashed effect */
+        .dashed-border-input {
+            border: 2px dashed #3b82f6; /* Tailwind blue-500 */
+            background-color: #f9fafb; /* Tailwind gray-50 */
         }
-        
-        /* Remove number input arrows */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
+        .input-label {
+            height: 3.5rem; /* Ensure consistent height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: #1f2937; /* Tailwind gray-800 */
+            cursor: pointer;
+        }
+        /* Hide number input arrows (spinners) for a cleaner look */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
-        input[type=number] {
+        input[type="number"] {
             -moz-appearance: textfield;
+        }
+        /* Style for placeholder text */
+        input::placeholder {
+            color: #9ca3af; /* Tailwind gray-400 */
+            font-weight: 400;
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+<body>
 
-    <!-- App Container -->
-    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-sm">
-        
-       <!-- Header Logo (Text version from image) -->
-        <div class="text-center mb-6">
-            <div class="flex justify-center items-center mb-1">
+<div id="app" class="w-full max-w-sm bg-white p-6 rounded-3xl shadow-2xl border border-gray-100">
+    
+    <!-- Logo/Header Placeholder -->
+     <div class="flex justify-center items-center mb-1">
                <img src="logo.jpg">
             </div>
           <br>
 
-        <!-- 40X40 Display Box -->
-        <div class="border-2 border-blue-500 rounded-lg text-center py-3 px-5 font-bold text-xl text-gray-800 mb-6">
-            40x40 NORMAL
+    <!-- Product Label -->
+    <div class="border-2 border-blue-500 rounded-lg text-center py-3 px-5 font-bold text-xl text-gray-800 mb-6 bg-white shadow-inner">
+        40x40 NORMAL
+    </div>
+
+    <!-- Total Input Entry (Now an editable input field that drives unit calculation) -->
+    <input type="number" id="total-display" value="" step="0.01" 
+           placeholder="Enter Meter"
+           oninput="calculateUnitsFromTotal()"
+           class="py-3 px-5 w-full mb-6 text-center font-bold text-3xl text-black-700 dashed-border-input rounded-xl transition duration-300 ease-in-out appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+    <!-- Input Fields -->
+    <div class="space-y-4 mb-8">
+        <!-- Falakad Input -->
+        <div class="grid grid-cols-3 gap-3">
+            <label for="falakad" class="col-span-1 input-label border-2 border-gray-300 rounded-lg shadow-sm hover:bg-blue-50 transition duration-150">Falakad</label>
+            <input type="number" id="falakad" value="0" min="0" oninput="updateUnitQuantities('falakad')" class="col-span-2 text-center text-2xl font-semibold dashed-border-input rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
 
-
-        <!-- Main Editable Input -->
-        <div class="mb-4">
-            <label for="totalMeters" class="sr-only">Total Meters</label>
-            <input 
-                type="number" 
-                id="totalMeters" 
-                value="" 
-                oninput="calculateBreakdown()"
-                class="w-full py-3 px-5 text-center text-2xl font-bold text-gray-800 border-2 border-dashed border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                placeholder="Enter Meters"
-            >
+        <!-- Cartoon Input -->
+        <div class="grid grid-cols-3 gap-3">
+            <label for="cartoon" class="col-span-1 input-label border-2 border-gray-300 rounded-lg shadow-sm hover:bg-blue-50 transition duration-150">Cartoon</label>
+            <input type="number" id="cartoon" value="0" min="0" oninput="updateUnitQuantities('cartoon')" class="col-span-2 text-center text-2xl font-semibold dashed-border-input rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
 
-        <!-- Read-only Results Grid -->
-        <div class="grid grid-cols-[auto_1fr] gap-3 items-center">
-            
-            <!-- Falakad Row -->
-            <label for="falakad_result" class="bg-white border-2 border-blue-500 rounded-lg py-3 px-4 font-semibold text-gray-800 text-center text-sm sm:text-base">
-                Falakad
-            </label>
-            <input 
-                type="text" 
-                id="falakad_result" 
-                readonly 
-                class="w-full py-3 px-5 text-center text-2xl font-bold text-gray-800 border-2 border-dashed border-blue-500 rounded-lg bg-gray-50"
-            >
-
-            <!-- Cartoon Row -->
-            <label for="cartoon_result" class="bg-white border-2 border-blue-500 rounded-lg py-3 px-4 font-semibold text-gray-800 text-center text-sm sm:text-base">
-                Cartoon
-            </label>
-            <input 
-                type="text" 
-                id="cartoon_result" 
-                readonly 
-                class="w-full py-3 px-5 text-center text-2xl font-bold text-gray-800 border-2 border-dashed border-blue-500 rounded-lg bg-gray-50"
-            >
-
-            <!-- Firi Row -->
-            <label for="firi_result" class="bg-white border-2 border-blue-500 rounded-lg py-3 px-4 font-semibold text-gray-800 text-center text-sm sm:text-base">
-                Firi
-            </label>
-            <input 
-                type="text" 
-                id="firi_result" 
-                readonly 
-                class="w-full py-3 px-5 text-center text-2xl font-bold text-gray-800 border-2 border-dashed border-blue-500 rounded-lg bg-gray-50"
-            >
+        <!-- Firi Input -->
+        <div class="grid grid-cols-3 gap-3">
+            <label for="firi" class="col-span-1 input-label border-2 border-gray-300 rounded-lg shadow-sm hover:bg-blue-50 transition duration-150">Firi</label>
+            <input type="number" id="firi" value="0" min="0" oninput="updateUnitQuantities('firi')" class="col-span-2 text-center text-2xl font-semibold dashed-border-input rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
+    </div>
 
-        <!-- BACK Link (now an <a> tag) -->
-        <div class="mt-6">
+   <div class="mt-6">
             <a 
                 href="40x40mainmenu.html" 
                 class="bg-blue-500 hover:bg-blue-600 transition-colors text-white w-full py-3.5 rounded-lg font-bold text-lg tracking-wider block text-center"
@@ -117,58 +95,152 @@
                 BACK
             </a>
         </div>
-    </div>
+</div>
 
-    <script>
-        function calculateBreakdown() {
-            // 1. Get user input
-            let totalMeters = parseFloat(document.getElementById('totalMeters').value);
+<script>
+    // --- CONSTANTS ---
+    const PRICE_WEIGHTS = {
+        Falakad: 80.64, 
+        Cartoon: 0.96,  
+        Firi: 0.16      
+    };
+
+    const CONVERSIONS = {
+        FalakadToCartoon: 84,    // 1 Falakad = 84 Cartoon
+        CartoonToFiri: 6         // 1 Cartoon = 6 Firi
+    };
+    
+    // Total Firi units in one Falakad (84 * 6)
+    const FALAKAD_TO_FIRI = CONVERSIONS.FalakadToCartoon * CONVERSIONS.CartoonToFiri; // 504
+
+    // --- FORWARD CALCULATION: Quantities -> Price ---
+
+    /**
+     * Calculates the total price based on the current unit quantities.
+     */
+    function updateTotalDisplay() {
+        const f = parseFloat(document.getElementById('falakad').value) || 0;
+        const c = parseFloat(document.getElementById('cartoon').value) || 0;
+        const r = parseFloat(document.getElementById('firi').value) || 0;
+
+        // Total Price = sum of (Quantity * Price_Weight)
+        let total = (f * PRICE_WEIGHTS.Falakad) + (c * PRICE_WEIGHTS.Cartoon) + (r * PRICE_WEIGHTS.Firi);
+
+        // Update the total display input field (only set value if total is greater than 0)
+        document.getElementById('total-display').value = total > 0 ? total.toFixed(2) : '';
+    }
+
+    /**
+     * Updates lower-level units based on the input source (Falakad/Cartoon) and recalculates the total price.
+     * @param {string} sourceUnit - The unit that the user just changed ('falakad', 'cartoon', or 'firi').
+     */
+    function updateUnitQuantities(sourceUnit) {
+        let f = parseFloat(document.getElementById('falakad').value) || 0;
+        let c = parseFloat(document.getElementById('cartoon').value) || 0;
+        // let r = parseFloat(document.getElementById('firi').value) || 0; // Not strictly needed here
+
+        // Apply Conversion Logic (Downwards only)
+        if (sourceUnit === 'falakad') {
+            // Falakad change updates Cartoon and Firi
+            c = f * CONVERSIONS.FalakadToCartoon;
+            r = c * CONVERSIONS.CartoonToFiri;
             
-            // Handle empty or invalid input
-            if (isNaN(totalMeters) || totalMeters < 0) {
-                totalMeters = 0;
-            }
+            // Update the display fields (Cartoon and Firi)
+            document.getElementById('cartoon').value = Math.round(c);
+            document.getElementById('firi').value = Math.round(r);
 
-            // 2. Define constants from your formula
-            const METERS_PER_FALAKAD = 80.64;
-            const METERS_PER_CARTOON = 0.96;
-            const METERS_PER_FIRI = 0.16; // (0.96 / 6)
-
-            // 3. Create a variable for the remainder
-            let remainingMeters = totalMeters;
-
-            // 4. Calculate Fal akad
-            // Get the whole number of falakads
-            let falakad_count = Math.floor(remainingMeters / METERS_PER_FALAKAD);
-            // Get the meters left over
-            remainingMeters = remainingMeters % METERS_PER_FALAKAD;
+        } else if (sourceUnit === 'cartoon') {
+            // Cartoon change updates Firi only
+            r = c * CONVERSIONS.CartoonToFiri;
             
-            // Add a small number (epsilon) to handle floating point errors
-            // e.g., 60 % 0.96 might be 0.47999999999999, not 0.48
-            remainingMeters = remainingMeters + 1e-9;
+            // Update the display field (Firi)
+            document.getElementById('firi').value = Math.round(r);
+            
+        } else {
+             // Firi change only triggers price update
+        }
+        
+        // Recalculate and update the price display
+        updateTotalDisplay();
+    }
 
-            // 5. Calculate Cartoon
-            // Get the whole number of cartoons from the remaining meters
-            let cartoon_count = Math.floor(remainingMeters / METERS_PER_CARTOON);
-            // Get the meters left over
-            remainingMeters = remainingMeters % METERS_PER_CARTOON;
+    // --- REVERSE CALCULATION: Price -> Quantities ---
 
-            // 6. Calculate Firi
-            // Use Math.round() on the last unit to clean up any tiny fractions left
-            let firi_count = Math.round(remainingMeters / METERS_PER_FIRI);
-
-            // 7. Display the results in the read-only fields
-            document.getElementById('falakad_result').value = falakad_count;
-            document.getElementById('cartoon_result').value = cartoon_count;
-            document.getElementById('firi_result').value = firi_count;
+    /**
+     * Calculates unit quantities (Falakad, Cartoon, Firi) based on the input Total Price, 
+     * distributing the price to maximize the largest unit (Falakad).
+     */
+    function calculateUnitsFromTotal() {
+        const totalPrice = parseFloat(document.getElementById('total-display').value) || 0;
+        
+        if (totalPrice <= 0) {
+            // If total price is 0 or less, clear all unit inputs
+            document.getElementById('falakad').value = 0;
+            document.getElementById('cartoon').value = 0;
+            document.getElementById('firi').value = 0;
+            return;
         }
 
-        // Run the calculation once when the page loads
-        // to show the default values (from input '60')
-        window.onload = function() {
-            calculateBreakdown();
-        };
-    </script>
+        // Price determines the total equivalent quantity of the base unit (Firi)
+        // Ensure rounding to handle floating point precision before calculating units
+        const totalFiriEquivalent = Math.round(totalPrice / PRICE_WEIGHTS.Firi);
+
+        let remainingFiri = totalFiriEquivalent;
+        let f = 0;
+        let c = 0;
+        let r = 0;
+        
+        // 1. Calculate Falakad (504 Firi per Falakad)
+        f = Math.floor(remainingFiri / FALAKAD_TO_FIRI);
+        remainingFiri %= FALAKAD_TO_FIRI;
+
+        // 2. Calculate Cartoon (6 Firi per Cartoon)
+        c = Math.floor(remainingFiri / CONVERSIONS.CartoonToFiri);
+        remainingFiri %= CONVERSIONS.CartoonToFiri;
+
+        // 3. Calculate Firi (remainder)
+        r = remainingFiri;
+
+        // 4. Update the Quantity Display Fields
+        document.getElementById('falakad').value = f;
+        document.getElementById('cartoon').value = c;
+        document.getElementById('firi').value = r;
+    }
+
+
+    /**
+     * Shows a message box instead of using alert().
+     */
+    function showMessage(message) {
+        console.log("Message Box: " + message);
+
+        const app = document.getElementById('app');
+        let messageBox = document.getElementById('message-box');
+        
+        if (!messageBox) {
+            messageBox = document.createElement('div');
+            messageBox.id = 'message-box';
+            messageBox.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 transition-opacity duration-300 opacity-0 pointer-events-none';
+            messageBox.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow-2xl max-w-xs w-full text-center">
+                    <p id="message-text" class="mb-4 text-gray-800 font-medium"></p>
+                    <button id="close-message" class="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">OK</button>
+                </div>
+            `;
+            document.body.appendChild(messageBox);
+
+            document.getElementById('close-message').onclick = () => {
+                messageBox.classList.remove('opacity-100', 'pointer-events-auto');
+                messageBox.classList.add('opacity-0', 'pointer-events-none');
+            };
+        }
+
+        document.getElementById('message-text').textContent = message;
+        messageBox.classList.add('opacity-100', 'pointer-events-auto');
+        messageBox.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+</script>
 
 </body>
 </html>
